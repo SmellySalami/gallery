@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Web Gallery 3</title>
+    <link href="style/main.css" rel="stylesheet" type="text/css"/>
+    <link href="style/posts.css" rel="stylesheet" type="text/css"/>
+    <link href="style/form.css" rel="stylesheet" type="text/css"/>
+    <link href="style/comments.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+    <header>
+        <a href="/" id="title">Web Gallery 3</a>
+    </header>
+     
+    <p id="error_box"></p>
+    <!-- post display section -->
+    <div id="image_section">
+        <!-- post post section -->
+        <form class="complex_form" id="post_image" action="/api/images/" method="POST" enctype="multipart/form-data">
+            <div class="form_title">Post an image </div>
+            <input type="text" id="image_title" name="title" class="form_element" placeholder="Enter image title" required/>
+            <input type="file" id="image_file" name="picture" class="form_element" required/>
+            <button type="submit" class="btn">Post your image<picture></picture></button>
+        </form>
+        
+        <!-- toggle button -->
+        <button id="toggle" class="btn">Toggle post form</button>
+
+        <!-- post display -->
+        <div id="posts"></div>
+    </div>
+
+    <!-- comment display section -->
+    <div id="comment_section">
+        
+        <!-- comment post section -->
+        <form class="complex_form" id="create_comment_form">
+            <div class="form_title">Post a comment</div>
+            <textarea rows="2" id="comment_content" class="form_element" name="user_message" placeholder="Enter your message" required></textarea>
+            <button type="submit" class="btn">Post your comment</button>
+        </form>
+
+        <div id="comments"></div>
+
+        <!-- change comment buttons -->
+        <div class="navigation">
+            <div class="next-icon icon"></div>
+            <div class="navigation_text">Change comments</div>
+            <div class="prev-icon icon"></div>
+        </div>
+    </div>
+
+    <footer>
+        <a href='/credits.html'>credits</a>
+    </footer>
+    <script src="js/index.js"></script>
+    <script src="js/api.js"></script>
+</body>
+</html>

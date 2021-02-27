@@ -1,0 +1,53 @@
+#comment_section{
+    display: block;
+}
+
+#comments{
+    font-size: 16px;
+    display:flex;
+    flex-direction: column; 
+    justify-content: center;
+    align-items: stretch;
+}
+
+.comment{
+    display:flex;
+    flex-flow:flex-start;
+    align-items:center;
+    width:100%;
+    margin:auto;
+    height:100px;
+    margin-top:20px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid grey; 
+
+}
+
+.comment_meta{
+    display: flex;
+    flex-direction: column;
+    padding: 10px 10px 10px 10px;
+}
+
+.commenter_name{
+    font: 10px;
+}
+
+.comment_date{
+    font: 10px;
+    border: none;
+}
+
+.comment_content{
+    flex:1;
+    padding: 0px 15px 10px 20px;
+    margin-left: 20px;
+    border-left-style: solid;
+    text-align: left;
+}
+
+.comment_delete{
+    /* background-size: cover; */
+    width: 50px;
+    height: 50px;
+}
