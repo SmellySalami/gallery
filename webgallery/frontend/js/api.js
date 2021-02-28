@@ -19,6 +19,7 @@ var api = (function(){
     ****************************** */ 
     let imagePageNum = 0;
     let commentPageNum = 0;
+    let galleryPageNum = '';
 
     function sendFiles(method, url, data, callback){
         // create multiform data for each key:val pair in data.
@@ -30,7 +31,7 @@ var api = (function(){
 
         let xhr = new XMLHttpRequest();
         xhr.onload = function() {
-            if (xhr.status !== 200) callback("[" + xhr.status + "]" + xhr.responseText, null);
+            if (xhr.status !== 200) callback("[" + xhr.status + "] " + xhr.responseText, null);
             else callback(null, JSON.parse(xhr.responseText));
         };
         xhr.open(method, url, true);
@@ -43,8 +44,10 @@ var api = (function(){
         let xhr = new XMLHttpRequest();
         // handle the callback function
         xhr.onload = function() {
-            if (xhr.status !== 200) callback("[" + xhr.status + "]" + xhr.responseText, null);
-            else callback(null, JSON.parse(xhr.responseText));
+            if (xhr.status !== 200) callback("[" + xhr.status + "] " + xhr.responseText, null);
+            else {
+                callback(null, JSON.parse(xhr.responseText));
+            }
         };
 
         // open the method, async = true should always be there
@@ -59,15 +62,39 @@ var api = (function(){
     }
 
     module.signup = function(username, password){
-        
+        send("POST", "/api/users/signup", {username: username, password:password}, function (err, res){
+            if(err) return notifyErrorListeners (err);
+            else {
+                galleryPageNum = module.getCurrentUser();
+                notifyImageListeners();
+                notifyUserListeners();
+            }
+        });
     }
     
     module.signin = function(username, password){
-        
+        send("POST", "/api/users/signin", {username: username, password:password},function (err, res){
+            if (err) notifyErrorListeners(err);
+            else {
+                galleryPageNum = module.getCurrentUser();
+                notifyImageListeners();
+                notifyUserListeners();
+            }
+        });
     }
     
     module.signout = function(){
-        
+        send("GET", "/api/users/signout", null, function(err, res){
+            // This should just return success code and nothing 
+            if (err) notifyErrorListeners(err);
+            else {
+                notifyUserListeners();
+            }
+        });
+    }
+
+    module.getAllUsers = function(callback){
+        send("GET", "/api/users", null, callback);
     }
     
     // add an image to the gallery
@@ -95,7 +122,7 @@ var api = (function(){
 
     // Gets the image added after imageId
     module.getNextImage = function(){
-        getImage(imagePageNum - 1, function(err, image){
+        getImage(imagePageNum - 1, galleryPageNum, function(err, image){
             if (err) notifyErrorListeners(err);
             else{
                 imagePageNum--;
@@ -106,7 +133,7 @@ var api = (function(){
 
     // Gets the image added before imageId
     module.getPrevImage = function(){
-        getImage(imagePageNum + 1, function(err, image){
+        getImage(imagePageNum + 1, galleryPageNum, function(err, image){
             if (err) notifyErrorListeners(err);
             else{
                 imagePageNum++;
@@ -117,7 +144,7 @@ var api = (function(){
     
     // add a comment to an image
     module.addComment = function(imageId, content){
-        send("POST", "/api/comments/", {imageId: imageId, author:'alice', content}, function(err, res){
+        send("POST", "/api/comments/", {imageId: imageId, author:'alice', content: content}, function(err, res){
             if (err) return notifyErrorListeners(err);
             else return notifyCommentListeners(imageId);
         });
@@ -145,10 +172,16 @@ var api = (function(){
     let imageListeners = [];
 
     // gets any image, happens to be the first one
-    let getImage = function(imgPage, callback){
-        send("GET", "/api/images/?page="+imgPage, null, callback);
+    let getImage = function(imgPage, gallery, callback){
+        send("GET", "/api/images/?page="+imgPage+"&gallery="+gallery, null, callback);
     };
-    
+
+    module.getGallery = function(imgPage, gallery){
+        imagePageNum = imgPage;
+        galleryPageNum = gallery;
+        notifyImageListeners();
+    };
+
     // call listener when an image is added or deleted from the gallery
     module.onImageUpdate = function(listener){
         imageListeners.push(listener);
@@ -159,7 +192,7 @@ var api = (function(){
     function notifyImageListeners(){
         // give all image listeners the image they're expecting
         imageListeners.forEach(function(listener){
-            getImage(imagePageNum, function(err, image){
+            getImage(imagePageNum, galleryPageNum, function(err, image){
                 if (err) notifyErrorListeners(err);
                 else {
                     listener(image);
@@ -185,7 +218,7 @@ var api = (function(){
     // Notify comment listeners. Runs all comment listeners
     function notifyCommentListeners(){
         // get the current image
-        getImage(imagePageNum, function(err, images){
+        getImage(imagePageNum, galleryPageNum, function(err, images){
             if (err) notifyErrorListeners (err);
             else{
                 let image = images[0];
@@ -203,6 +236,26 @@ var api = (function(){
                     });
                 }
             }
+        });
+    }
+
+    let userListeners = [];
+
+    module.getCurrentUser = function(){
+        var username = document.cookie.split("username=")[1];
+        if (!username || username.length == 0) return null;
+        return username;
+    }
+
+    // call handler when user is changed
+    module.onUserUpdate = function(handler){
+        userListeners.push(handler);
+        handler(module.getCurrentUser());
+    };
+
+    function notifyUserListeners(){
+        userListeners.forEach(function(handler){
+            handler(module.getCurrentUser());
         });
     }
 

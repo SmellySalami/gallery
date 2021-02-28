@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Web Gallery 3</title>
+    <link href="style/main.css" rel="stylesheet" type="text/css"/>
+    <link href="style/form.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+    <header>
+        <a href="/" id="title">Web Gallery 3</a>
+    </header>
+
+    <p id="error_box"></p>
+    
+    <div class="container">
+        <form id="signup_form" class="complex_form" action='/signup/' method="POST">
+          <input id="username" type="text" name="username" class="form_element" placeholder="Enter a username" required/>
+          <input id="password" type="password" name="password" class="form_element" placeholder="Enter a password" required/>
+          <button type="submit" class="btn">Sign Up</button>
+        </form>
+    </div>
+    
+    <footer>
+        <a href='/credits.html'>credits</a>
+    </footer>
+    <script src="js/api.js"></script>
+    <script src="js/signup.js"></script>
+</body>
+</html>

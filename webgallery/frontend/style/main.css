@@ -17,14 +17,14 @@ header{
     display:flex;
     margin-top:36px;
     height: 64px;
-    justify-content:flex-end;
+    justify-content:space-between;
 }
 
 header #title{
     color: black;
     text-decoration:none;
     margin: 0px;
-    width:100%;
+    /* width:100%; */
     font-size:48px;
 }
 
@@ -89,6 +89,11 @@ footer{
 
 .prev-icon{
     background-image: url('../media/prev-page.png');
+}
+
+.hidden{
+    visibility: collapse;
+    position: absolute;
 }
 
 

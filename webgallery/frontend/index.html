@@ -11,9 +11,18 @@
 <body>
     <header>
         <a href="/" id="title">Web Gallery 3</a>
+        <a href="/signup.html" id="signup" class="btn header_btn">Sign up</a>
+        <a href="/signout/" id="signout" class="btn header_btn">Sign out</a>
     </header>
      
     <p id="error_box"></p>
+
+    <form id="signin" class="complex_form" method="POST" action="signin">
+        <input id="username" type="text" name="username" class="form_element" placeholder="Enter a username" required/>
+        <input id="password" type="password" name="password" class="form_element" placeholder="Enter a password" required/>
+        <button type="submit" class="btn">Sign In</button>
+    </form>
+
     <!-- post display section -->
     <div id="image_section">
         <!-- post post section -->
@@ -27,13 +36,17 @@
         <!-- toggle button -->
         <button id="toggle" class="btn">Toggle post form</button>
 
+        <!-- TODO container and css for this -->
+        <label>Select Gallery
+            <select id="select_gallery" class="form_element"> 
+            </select>
+        </label>
         <!-- post display -->
         <div id="posts"></div>
     </div>
 
     <!-- comment display section -->
     <div id="comment_section">
-        
         <!-- comment post section -->
         <form class="complex_form" id="create_comment_form">
             <div class="form_title">Post a comment</div>

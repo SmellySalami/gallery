@@ -3,7 +3,6 @@
     window.addEventListener('load', function () {
         // add listener for showing error
         api.onError(function(err){
-            console.error("[error]", err);
             let error_box = document.querySelector('#error_box');
             error_box.innerHTML = err;
             error_box.style.visibility = "visible";
@@ -12,9 +11,7 @@
         // add listeners for rendering page
         api.onImageUpdate(function (images) {
             document.querySelector('#posts').innerHTML = '';
-            console.log("images:", images);
-            //render elements of the post
-            // TODO fix ugly error handling
+            // render elements of the post
             if (images.length > 0) {
                 let image = images[0];
                 document.querySelector('#comment_section').style.display = 'block';
@@ -23,7 +20,7 @@
                 elem.id = image._id;
                 elem.innerHTML = `
                 <div class="delete-icon icon"></div>
-                <img class="post_image" src="/api/images/${image._id}/picture">
+                <img class="post_image" src="/api/images/${image._id}/file">
                 <div class="post_author">Posted By: ${image.author}</div>
                 <div class="post_title">Title: ${image.title}</div>
                 <div class="navigation">
@@ -58,7 +55,6 @@
         // handler for rendering comments, if any
         api.onCommentUpdate(function(comments){
             document.querySelector('#comments').innerHTML='';
-            console.log("comments:", comments);
             comments.forEach(function(cmt){
                 let elem = document.createElement('div');
                 elem.className = "comment";
@@ -80,6 +76,36 @@
             });
         });
     
+        // hide/show corresponding elements
+        api.onUserUpdate(function(username){
+            document.querySelector('#signout').style.display = (username)? 'block': 'none';
+            document.querySelector('#comment_section').style.display = (username)? 'block': 'none';
+            document.querySelector('#signup').style.display = (username)? 'none': 'block';
+            document.querySelector('#signin').style.display = (username)? 'none': 'flex';
+            document.querySelector('#image_section').style.display = (username)? 'block': 'none';
+        });
+
+        // retrieve and display list of all usernames
+        api.onUserUpdate(function(username){
+            if (username) {
+                // retrieve all usernames
+                api.getAllUsers(function(err, usernames){
+                    document.querySelector("#select_gallery").innerHTML = '';
+                    usernames.forEach(function(user){
+                        var elmt = document.createElement('option');
+                        elmt.value = user._id;
+                        elmt.innerHTML = user._id;
+                        document.querySelector("#select_gallery").prepend(elmt);
+                    });
+                }); 
+            } 
+        });
+
+        document.querySelector('#select_gallery').addEventListener('change', function(e){
+            let gallery = document.querySelector('#select_gallery').value;
+            api.getGallery(0, gallery);
+        });
+
         // image form add image event
         document.querySelector('#post_image').addEventListener('submit', function(e){
             e.preventDefault();
@@ -100,14 +126,27 @@
 
         // next page comments 
         document.querySelector('#comment_section .next-icon').addEventListener('click', function(e){
-            let imageId = document.querySelector('.post').id;
             api.nextCommentPage();
         });
 
         // prev page comments
         document.querySelector('#comment_section .prev-icon').addEventListener('click', function(e){
-            let imageId = document.querySelector('.post').id;
             api.prevCommentPage();
+        });
+
+        // TODO signin
+        document.querySelector('#signin').addEventListener('submit', function(e){
+            e.preventDefault();
+            let username = document.querySelector("#username").value;
+            let password = document.querySelector("#password").value;
+            document.querySelector("#signin").reset();
+            api.signin(username, password);
+        });
+
+        // TODO sigout
+        document.querySelector("#signout").addEventListener('click', function(e){
+            e.preventDefault();
+            api.signout();
         });
 
         // toggle post form
@@ -120,7 +159,5 @@
                 form.style.display = 'none';
             }
         });
-
     });
-
 }());
