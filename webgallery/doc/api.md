@@ -1,5 +1,7 @@
 # Web Gallary 2 REST API Documentation
 
+Note: remember to clear your cookies before use
+
 ## Image API
 
 ### Create

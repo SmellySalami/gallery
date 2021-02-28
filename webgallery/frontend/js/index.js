@@ -134,7 +134,7 @@
             api.prevCommentPage();
         });
 
-        // TODO signin
+        // signin
         document.querySelector('#signin').addEventListener('submit', function(e){
             e.preventDefault();
             let username = document.querySelector("#username").value;
@@ -143,7 +143,7 @@
             api.signin(username, password);
         });
 
-        // TODO sigout
+        // sigout
         document.querySelector("#signout").addEventListener('click', function(e){
             e.preventDefault();
             api.signout();

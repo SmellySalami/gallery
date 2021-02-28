@@ -70,7 +70,7 @@ var api = (function(){
                 notifyUserListeners();
             }
         });
-    }
+    };
     
     module.signin = function(username, password){
         send("POST", "/api/users/signin", {username: username, password:password},function (err, res){
@@ -81,7 +81,7 @@ var api = (function(){
                 notifyUserListeners();
             }
         });
-    }
+    };
     
     module.signout = function(){
         send("GET", "/api/users/signout", null, function(err, res){
@@ -91,11 +91,11 @@ var api = (function(){
                 notifyUserListeners();
             }
         });
-    }
+    };
 
     module.getAllUsers = function(callback){
         send("GET", "/api/users", null, callback);
-    }
+    };
     
     // add an image to the gallery
     module.addImage = function(title, file){
@@ -107,7 +107,7 @@ var api = (function(){
                 return notifyImageListeners();
             }
         });
-    }
+    };
     
     // delete an image from the gallery given its imageId
     module.deleteImage = function(imageId){
@@ -118,7 +118,7 @@ var api = (function(){
                 return notifyImageListeners();
             }
         });
-    }
+    };
 
     // Gets the image added after imageId
     module.getNextImage = function(){
@@ -148,7 +148,7 @@ var api = (function(){
             if (err) return notifyErrorListeners(err);
             else return notifyCommentListeners(imageId);
         });
-    }
+    };
     
     // delete a comment to an image
     module.deleteComment = function(commentId){
@@ -156,7 +156,7 @@ var api = (function(){
             if (err) return notifyErrorListeners(err);
             else return notifyCommentListeners();
         }); 
-    }
+    };
 
     // page changing for comments
     module.nextCommentPage = function(){
@@ -190,16 +190,19 @@ var api = (function(){
 
     // Notify image listeners. Runs all image listeners
     function notifyImageListeners(){
-        // give all image listeners the image they're expecting
-        imageListeners.forEach(function(listener){
-            getImage(imagePageNum, galleryPageNum, function(err, image){
-                if (err) notifyErrorListeners(err);
-                else {
-                    listener(image);
-                    notifyCommentListeners();
-                }
+        // make sure the gallery is set 
+        if (galleryPageNum !=='' ){
+            // give all image listeners the image they're expecting
+            imageListeners.forEach(function(listener){
+                getImage(imagePageNum, galleryPageNum, function(err, image){
+                    if (err) notifyErrorListeners(err);
+                    else {
+                        listener(image);
+                        notifyCommentListeners();
+                    }
+                });
             });
-        });
+        }
     }
 
     let commentListeners = [];
@@ -212,31 +215,35 @@ var api = (function(){
     // call handler when a comment is added or deleted to an image
     module.onCommentUpdate = function(handler){
         commentListeners.push(handler);
-        notifyCommentListeners()
+        notifyCommentListeners();
     };
 
     // Notify comment listeners. Runs all comment listeners
     function notifyCommentListeners(){
-        // get the current image
-        getImage(imagePageNum, galleryPageNum, function(err, images){
-            if (err) notifyErrorListeners (err);
-            else{
-                let image = images[0];
-                // get the comments of curr image using page and id
-                if (image){
-                    getComments(image._id, commentPageNum, function(err, comments){
-                        if (err){
-                            (commentPageNum < 0)? commentPageNum = 0: commentPageNum--; 
-                            notifyErrorListeners(err);
-                        }else{
-                            commentListeners.forEach(function(listener){
-                                listener(comments);
-                            });
-                        }
-                    });
+        // make sure the gallery is set 
+        if (galleryPageNum !=='' ){
+
+            // get the current image
+            getImage(imagePageNum, galleryPageNum, function(err, images){
+                if (err) notifyErrorListeners (err);
+                else{
+                    let image = images[0];
+                    // get the comments of curr image using page and id
+                    if (image){
+                        getComments(image._id, commentPageNum, function(err, comments){
+                            if (err){
+                                (commentPageNum < 0)? commentPageNum = 0: commentPageNum--; // jshint ignore:line
+                                notifyErrorListeners(err);
+                            }else{
+                                commentListeners.forEach(function(listener){
+                                    listener(comments);
+                                });
+                            }
+                        });
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     let userListeners = [];
@@ -245,7 +252,7 @@ var api = (function(){
         var username = document.cookie.split("username=")[1];
         if (!username || username.length == 0) return null;
         return username;
-    }
+    };
 
     // call handler when user is changed
     module.onUserUpdate = function(handler){

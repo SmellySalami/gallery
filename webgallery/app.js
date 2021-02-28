@@ -24,27 +24,27 @@ app.use(function (req, res, next){
 });
 
 let isAuthenticated = function(req, res, next){
-    if (!req.username) return res.status(401).end("access denied")
+    if (!req.username) return res.status(401).end("access denied");
     next();
-}
+};
 
 // Structure of file system
 let Image = function image(username, title, file){
     this.author = username;
     this.title = title;
     this.file = file;
-}
+};
 
 let Comment = function comment(imageId, author, content){
     this.imageId = imageId;
     this.author = author;
     this.content = content;
-}
+};
 
 let User = function user(username, hash){
     this.username = username;
     this.hash = hash;
-}
+};
 
 let imageDB = new Datastore({ filename:'db/images.db', autoload:true, timestampData:true});
 let commentDB = new Datastore({filename:'db/comments.db', autoload:true, timestampData:true});
@@ -61,6 +61,7 @@ app.post('/api/images/', [isAuthenticated, upload.single("file")], function (req
     console.log("received image", image);
     
     if(!file) return res.status(400).end("Bad request. No file.");
+
     imageDB.insert(image, function(err, image){
         if (err) return res.status(500).end(err);
         else return res.json({imageId:image._id});
@@ -79,7 +80,7 @@ app.get('/api/images/', isAuthenticated, function (req, res, next) {
         if (err) return res.status(500).end(err);
         else {
             if (page != 0 && image.length == 0){
-                return res.status(404).end("No more images. Try going the other way.")
+                return res.status(404).end("No more images. Try going the other way.");
             } else {
                 return res.json(image);
             }
@@ -122,12 +123,11 @@ app.delete('/api/images/:id/', isAuthenticated, function (req, res, next) {
                 commentDB.remove({imageId: image._id}, {}, function(err, num){
                     if (err) return res.status(500).end(err);
                     // return info of the deleted image
-                    let body = {}
+                    let body = {};
                     body._id = image._id;
                     body.author = image.author;
                     body.title = image.title;
                     return res.json(body);
-   
                 });
             }
         });
@@ -167,7 +167,7 @@ app.get('/api/comments/', isAuthenticated, function(req, res, next){
         if (err) return res.status(500).end(err);
         else {
             if (page != 0 && comments.length == 0){
-                return res.status(404).end("No more comments. Try going the other way.")
+                return res.status(404).end("No more comments. Try going the other way.");
             } else {
                 return res.json(comments.reverse());
             }
@@ -190,8 +190,8 @@ app.delete('/api/comments/:id', function(req, res, next){
                 if (err) return res.status(500).end(err);
                 else if (!image) return res.status(404).end("Image id: " + comment.imageId + " does not exist");
                 else {
-                    // if conditions are satisfied then delete
-                    if (comment.author == image.author || username == comment.author){
+                    // if username = commenter, or poster then delete
+                    if (username == image.author || username == comment.author){
                         commentDB.remove({_id:commentId}, {}, function(err, num){
                             if (err) return res.status(500).end(err);
                             else return res.json(comment);
@@ -203,7 +203,7 @@ app.delete('/api/comments/:id', function(req, res, next){
                 }
             });
         }
-    })
+    });
 });
 
 // create user
@@ -230,7 +230,7 @@ app.post('/api/users/signup', function(req, res, next){
                         path : '/', 
                         maxAge: 60 * 60 * 24 * 7
                     }));
-                    return res.json("user " + username + " signed up")
+                    return res.json("user " + username + " signed up");
                 });
             });
         });
@@ -266,9 +266,9 @@ app.post('/api/users/signin', function(req, res, next){
 
 // Ends the user's session
 app.get('/api/users/signout', isAuthenticated, function(req, res, next){
-    // TODO this needs to be authenticated and the same user as session
+
+    // make sure the we know who to signout
     let username = req.username;
-    // make sure username and password exists
     if(!username) return res.status(400).end("Bad request.");
 
     req.session.destroy();
@@ -282,7 +282,6 @@ app.get('/api/users/signout', isAuthenticated, function(req, res, next){
 // gets list of all users
 app.get('/api/users/', isAuthenticated, function(req, res, next){
     userDB.find({}, {hash:0}, function(err, users){
-        console.log(users);
         if (err) return res.status(500).end(err);
         else {
             return res.json(users);

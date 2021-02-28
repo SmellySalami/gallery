@@ -14,7 +14,6 @@
 
         // redirect to main page
         api.onUserUpdate(function(username){
-            // TODO what does this do when empty?
             if (username) window.location.href = '/';
         });
 
@@ -27,4 +26,4 @@
         });
 
     });
-}())
+}());
