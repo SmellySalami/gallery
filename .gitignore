@@ -7,4 +7,5 @@ node_modules
 uploads
 db
 *-lock.json
+tests
 
