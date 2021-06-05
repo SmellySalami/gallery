@@ -1,4 +1,12 @@
-The objective of these assignments is to build an application called *The Web Gallery* where users can share pictures and comments. This application is similar to existing web applications such as Facebook (the photo album part), Picasa or Flickr. 
+# README
+
+The objective of these assignments is to build an application called *The Web Gallery* where users can share pictures and comments. This application is similar to existing web applications such as Facebook (the photo album part), Picasa or Flickr. Clone the repository and use the follow code to test the project
+
+```
+cd webgallery
+npm install
+nodemon app.js
+```
 
 # Managing users and Security
 
